@@ -71,7 +71,7 @@ If provider is Cyberark; plugin will use certificate chain and private key to au
     ```
               - name: custom-cred-lookup-plugin
                 mountPath: >-
-                  /var/lib/awx/venv/ansible_ibm/lib/python2.7/site-packages/ansible/plugins/lookup/custompassword.py
+                  /usr/lib/python2.7/site-packages/ansible/plugins/lookup/custompassword.py
                 subPath: custompassword.py
     ```
 
