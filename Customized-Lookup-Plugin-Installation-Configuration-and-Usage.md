@@ -74,6 +74,14 @@ If provider is Cyberark; plugin will use certificate chain and private key to au
                   /usr/lib/python2.7/site-packages/ansible/plugins/lookup/custompassword.py
                 subPath: custompassword.py
     ```
+      **Important Note**
+      Mount location is related with venv you are using. If your venv has its own plugins folder, plugin needs to be deployed to there as well. venv's precedence is higher than default plugins.
+
+      Example location for venv:
+      ```
+      /var/lib/awx/venv/ansible_ibm/lib/python2.7/site-packages/ansible/plugins/lookup/
+      ```
+
 
 3. Tower pod(s) will restart automatically after saving. 
 
