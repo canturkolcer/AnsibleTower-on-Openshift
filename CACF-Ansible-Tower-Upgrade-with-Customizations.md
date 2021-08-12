@@ -93,9 +93,10 @@
     ```
               - name: custom-cred-lookup-plugin
                 mountPath: >-
-                  /var/lib/awx/venv/ansible_ibm/lib/python2.7/site-packages/ansible/plugins/lookup/custompassword.py
+                  /usr/lib/python2.7/site-packages/ansible/plugins/lookup/custompassword.py
                 subPath: custompassword.py
     ```
+    **Important Note :** Please get familiar with custom plugin before using above line: [Customized Lookup Plugin](Customized-Lookup-Plugin-Installation-Configuration-and-Usage.md)
 
     - Increase CPU and Memory for ansible-tower-task container to have more resources for each tower instance
     ```
