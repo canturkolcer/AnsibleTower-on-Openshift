@@ -67,17 +67,42 @@ Also, To improve restore performance you may need to tweak your postgresql memor
 
 ## Restore Ansible Tower
 
-1) Change openshift project to ansible tower and scale down Ansible tower deployment.
+1. Change openshift project to ansible tower scale down Ansible tower and postgresql deployments.
 
     ```
     $ oc project tower
     $ oc scale deployment ansible-tower --replicas=0
+    $ oc scale deploymentconfig postgresql --replicas=0
     ```
 
-2) Copy backup to postgresql container. 
+2. Delete and recreate postgresql PVC if exists. Web UI can be used.
+
+    ```
+    $ oc delete pvc/postgresql
+
+    $ oc get pvc/postgresql -o yaml
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+        name: postgresql
+        namespace: tower
+        spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+            requests:
+            storage: 500Gi
+        storageClassName: ocs-storagecluster-cephfs
+        volumeMode: Filesystem
+
+    ```
+
+
+3. Scale up postgresql deployment and copy backup to postgresql container. 
     *** 'oc exec' can be used like back up here but during restore there are creating index steps which makes connection idle until it is done. oc command will get timeout and restore will get broken. ***
 
     ```
+    $ oc scale deploymentconfig/postgresql --replicas=1
     $ oc get pods
         NAME                             READY   STATUS      RESTARTS   AGE
         ansible-tower-xxx-yyy   4/4     Running     0          19h
@@ -86,11 +111,11 @@ Also, To improve restore performance you may need to tweak your postgresql memor
     $ oc cp tower.db postgresql-2-zzz:/tmp/tower.db    
     ```
 
-3) Restore Ansible Tower.
+2) Restore Ansible Tower.
     *** used output redirection here to keep the logs in case of any time out happens ***
 
     ```
-    PGPASSWORD="*****" pg_restore -v -j 10 --host="postgresql" -p "5432" --username="admin" --dbname="tower" /tmp/tower.db >restore.log 2>&1
+    PGPASSWORD="*****" pg_restore -v -j 10 --host="postgresql" -p "5432" --username="admin" --dbname="tower" --clean /tmp/tower.db >restore.log 2>&1
     ```
     *** Important parameters of backup command ***
      - j: number of jobs will run in parallel
@@ -100,7 +125,7 @@ Also, To improve restore performance you may need to tweak your postgresql memor
         POSTGRESQL_SERVICE_PORT_POSTGRESQL=5432
         POSTGRESQL_SERVICE_PORT=5432
         ```
-4. Scale up tower.    
+3. Scale up tower.    
     ```
     $ oc scale deployment ansible-tower --replicas=1
     ```

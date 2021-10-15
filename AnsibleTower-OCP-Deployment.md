@@ -1,7 +1,7 @@
 1. Create a new namespace on Openshift and switch to that project
 
   ```
-  % # oc new-project tower
+  # oc new-project tower
   Now using project "tower" on server "https://10.72.90.153:6443".
 
   ```
@@ -107,47 +107,4 @@
    "ANSIBLE_SCP_IF_SSH": "True",
    "ANSIBLE_TIMEOUT": "60"
   }
-  ```
-
-11. Check the version you will install from CACF webpage.
-  ```
-  https://w3.ibm.com/w3publisher/cacf-release-notes/release-versions
-  ```
-12. Login to artifactory and create a token for your user:
-  https://eu.artifactory.swg-devops.com and navigate to Edit Profile and create an API key.
-
-13. Create secret on openshift and link it with your tower deployment
-
-  ```
-  $ oc create secret docker-registry cacf-repo-pull-secret --docker-server=gts-cacf-global-team-prod-docker-local.artifactory.swg-devops.com --docker-username=<your user> --docker-password=<api key> --docker-email=<user email>
-  $ oc secrets link awx cacf-repo-pull-secret --for=pull
-  ```
-
-14. Edit your deployment, change image url to golden image and save it (it is a vi window so to save it use <ESC>wq!):
-
-  ```
-  $ oc edit deployment/ansible-tower
-  .....
-  spec:
-    containers:
-      - image: gts-cacf-global-team-prod-docker-local.artifactory.swg-devops.com/tower/3.7.0:20.6.1
-        imagePullPolicy: Always
-        name: ansible-tower-web
-
-  .....
-    image: gts-cacf-global-team-prod-docker-local.artifactory.swg-devops.com/tower/3.7.0:20.6.1
-    imagePullPolicy: Always
-    name: ansible-tower-task
-  .....    
-
-  ```
-
-15. Wait for your pods to running again.
-
-  ```
-  % oc get pods
-    NAME                                   READY   STATUS      RESTARTS   AGE
-    ansible-tower-f5f5d58bd-59vh4          4/4     Running     0          29d
-    postgresql-1-65gqd                     1/1     Running     0          73d
-
   ```
